@@ -5,7 +5,7 @@ import SelectButton from '../SelectButton/SelectButton';
 import ObservacoesInput from '../ObservacoesInput';
 import axios from 'axios';
 import { Laboratorio, Propriedade } from '../../types';
-import { Container, DateContainer, FormCard, FormTitle, SelectContainer, FieldsWrapper, InfoTitle, ButtonSave,  Button, Separator, OptionsWrapper, DualSelectContainer, CnpjText } from './FormularioStyles';
+import { Container, DateContainer, FormCard, FormTitle, SelectContainer, FieldsWrapper, InfoTitle, ButtonSave, Button, Separator, OptionsWrapper, DualSelectContainer, CnpjText } from './FormularioStyles';
 
 const Formulario: React.FC = () => {
   const [nome, setNome] = useState('');
@@ -35,6 +35,13 @@ const Formulario: React.FC = () => {
     }
   };
 
+  const handleClearSelection = (tipo: string) => {
+    if (tipo === 'propriedade') {
+      setPropriedadeSelecionada(null);
+    } else if (tipo === 'laboratorio') {
+      setLaboratorioSelecionado(null);
+    }
+  };
 
   return (
     <Container>
@@ -56,11 +63,15 @@ const Formulario: React.FC = () => {
             label="Propriedades *"
             value={propriedadeSelecionada}
             onSelectClick={() => setPropriedadeAberta(!propriedadeAberta)}
+            cnpj={propriedadeSelecionada ? propriedades.find(prop => prop.nome === propriedadeSelecionada)?.cnpj : null}
+            onClearSelection={() => handleClearSelection('propriedade')}
           />
           <SelectButton
             label="Laboratórios *"
             value={laboratorioSelecionado}
             onSelectClick={() => setLaboratorioAberto(!laboratorioAberto)}
+            cnpj={laboratorioSelecionado ? propriedades.find(prop => prop.nome === laboratorioSelecionado)?.cnpj : null}
+            onClearSelection={() => handleClearSelection('laboratorio')}
           />
         </SelectContainer>
 
