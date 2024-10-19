@@ -10,7 +10,31 @@ const DateInput: React.FC<{ label: string }> = ({ label }) => {
       variant="standard"
       margin="normal"
       slotProps={{
+        input: {
+          sx: {
+            color: '#000000',
+            '&:before': {
+              borderBottomColor: '#006F59',
+            },
+            '&:after': {
+              borderBottomColor: '#006F59',
+            },
+            '&:hover:not(.Mui-disabled):before': {
+              borderBottomColor: '#006F59',
+            },
+          },
+        },
+        htmlInput: {
+          sx: {
+            label,
+          }
+        },
         inputLabel: {
+          sx: {
+            '&.Mui-focused': {
+              color: '#006F59',
+            },
+          },
           shrink: true,
         },
       }}

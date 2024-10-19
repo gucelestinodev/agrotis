@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  size?: 'small' | 'large';
+}
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -13,14 +17,14 @@ export const FormCard = styled.div`
   width: 100%;
 `;
 
-export const ButtonWrapper = styled.div`
+export const InfoTitle = styled.div`
   display: flex;
   justify-content: space-between;
   background-color: #006F59;
-  padding: 0px 15px;
+  padding: 0px 16px;
 `;
 
-export const Button = styled.button`
+export const ButtonSave = styled.button`
   background-color: #006F59;
   border: none;
   color: #ffffff;
@@ -55,7 +59,7 @@ export const FieldsWrapper = styled.div`
   gap: 20px;
   flex-wrap: wrap;
   margin-bottom: 20px;
-  padding: 0px 15px;
+  padding: 0px 16px;
 
   & > div {
     flex: 1;
@@ -68,5 +72,73 @@ export const DateContainer = styled.div`
   flex-direction: row;
 `;
 
+export const Separator = styled.div`
+  margin: 0px 12px;
+`;
 
+export const ContainerSelect = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%; 
+`;
 
+export const SelectContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0px 16px; 
+
+  > * {
+    flex: 1;
+    max-width: 50%;
+  }
+`;
+
+export const DualSelectContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; 
+  width: 100%; 
+  background-color: #F1F1F1;
+  
+  > * {
+    flex: 1;
+    max-width: 50%;
+  }
+`;
+
+export const Button = styled.button<ButtonProps>`
+  background-color: transparent; 
+  color: black;
+  border: none;
+  padding: 12px;
+  cursor: pointer; 
+  text-align: start;
+  font-size: ${({ size }) => (size === 'large' ? '16px' : '14px')};
+  
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;
+
+export const OptionsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 6px;
+  margin: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 280px; 
+  overflow-y: auto;
+
+  h4 {
+    margin-bottom: 8px;
+  }
+`;
+
+export const CnpjText = styled.span`
+  display: block;
+  font-size: 12px;
+  opacity: 0.5;
+`;

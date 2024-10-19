@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import TextInput from '../TextInput';
 import DateInput from '../DateInput';
-import SelectInput from '../SelectInput';
+import SelectButton from '../SelectButton/SelectButton';
 import ObservacoesInput from '../ObservacoesInput';
 import axios from 'axios';
 import { Laboratorio, Propriedade } from '../../types';
-import { Container, DateContainer, FormCard, FormTitle, FieldsWrapper, ButtonWrapper, Button } from './FormularioStyles';
-
+import { Container, DateContainer, FormCard, FormTitle, SelectContainer, FieldsWrapper, InfoTitle, ButtonSave,  Button, Separator, OptionsWrapper, DualSelectContainer, CnpjText } from './FormularioStyles';
 
 const Formulario: React.FC = () => {
   const [nome, setNome] = useState('');
-  // const [dataInicial, setDataInicial] = useState<Date | null>(null);
-  // const [dataFinal, setDataFinal] = useState<Date | null>(null);
   const [observacoes, setObservacoes] = useState('');
   const [laboratorios, setLaboratorios] = useState<Laboratorio[]>([]);
   const [propriedades, setPropriedades] = useState<Propriedade[]>([]);
-  const [laboratorioSelecionado, setLaboratorioSelecionado] = useState<number | null>(null);
-  const [propriedadeSelecionada, setPropriedadeSelecionada] = useState<number | null>(null);
+  const [laboratorioSelecionado, setLaboratorioSelecionado] = useState<string | null>(null);
+  const [propriedadeSelecionada, setPropriedadeSelecionada] = useState<string | null>(null);
+  const [propriedadeAberta, setPropriedadeAberta] = useState(false);
+  const [laboratorioAberto, setLaboratorioAberto] = useState(false);
 
   useEffect(() => {
     axios.get('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/laboratorios.json')
@@ -26,43 +25,72 @@ const Formulario: React.FC = () => {
       .then(response => setPropriedades(response.data));
   }, []);
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   const dados = {
-  //     nome,
-  //     // dataInicial,
-  //     // dataFinal,
-  //     laboratorioId: laboratorioSelecionado,
-  //     propriedadeId: propriedadeSelecionada,
-  //     observacoes,
-  //   };
-  //   console.log(dados);
-  // };
+  const handleOptionSelect = (tipo: string, nome: string) => {
+    if (tipo === 'propriedade') {
+      setPropriedadeSelecionada(nome);
+      setPropriedadeAberta(false);
+    } else if (tipo === 'laboratorio') {
+      setLaboratorioSelecionado(nome);
+      setLaboratorioAberto(false);
+    }
+  };
+
 
   return (
     <Container>
       <FormCard>
-        <ButtonWrapper>
+        <InfoTitle>
           <FormTitle>Teste front-end</FormTitle>
-          <Button>
-            Salvar
-          </Button>
-        </ButtonWrapper>
+          <ButtonSave>Salvar</ButtonSave>
+        </InfoTitle>
         <FieldsWrapper>
           <TextInput label="Nome *" value={nome} onChange={(e) => setNome(e.target.value)} />
           <DateContainer>
             <DateInput label="Data Inicial *" />
+            <Separator />
             <DateInput label="Data Final *" />
           </DateContainer>
         </FieldsWrapper>
-        <FieldsWrapper>
-          <SelectInput label="Propriedades *" options={propriedades} value={propriedadeSelecionada} onChange={(e) => setPropriedadeSelecionada(e.target.value as number)} />
-          <SelectInput label="Laboratórios *" options={laboratorios} value={laboratorioSelecionado} onChange={(e) => setLaboratorioSelecionado(e.target.value as number)} />
-        </FieldsWrapper>
+        <SelectContainer>
+          <SelectButton
+            label="Propriedades *"
+            value={propriedadeSelecionada}
+            onSelectClick={() => setPropriedadeAberta(!propriedadeAberta)}
+          />
+          <SelectButton
+            label="Laboratórios *"
+            value={laboratorioSelecionado}
+            onSelectClick={() => setLaboratorioAberto(!laboratorioAberto)}
+          />
+        </SelectContainer>
+
         <FieldsWrapper>
           <ObservacoesInput value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
         </FieldsWrapper>
       </FormCard>
+      <DualSelectContainer>
+        {propriedadeAberta && (
+          <OptionsWrapper>
+            {propriedades.map((prop) => (
+              <Button key={prop.id} onClick={() => handleOptionSelect('propriedade', prop.nome)} size="small">
+                <div>
+                  {prop.nome}
+                  <CnpjText>{prop.cnpj}</CnpjText>
+                </div>
+              </Button>
+            ))}
+          </OptionsWrapper>
+        )}
+        {laboratorioAberto && (
+          <OptionsWrapper>
+            {laboratorios.map((lab) => (
+              <Button key={lab.id} onClick={() => handleOptionSelect('laboratorio', lab.nome)} size="large">
+                {lab.nome}
+              </Button>
+            ))}
+          </OptionsWrapper>
+        )}
+      </DualSelectContainer>
     </Container>
   );
 };
