@@ -25,7 +25,16 @@ import {
 import ErrorModal from '../Modal/ModalError';
 
 const Formulario: React.FC = () => {
-  const { register, handleSubmit } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors }, setError, clearErrors } = useForm<FormData>({
+    defaultValues: {
+      nome: '',
+      dataInicial: '',
+      dataFinal: '',
+      observacoes: '',
+    },
+    mode: 'onSubmit',
+  });
+
   const [laboratorioSelecionado, setLaboratorioSelecionado] = useState<string | null>(null);
   const [propriedadeSelecionada, setPropriedadeSelecionada] = useState<string | null>(null);
   const [propriedadeAberta, setPropriedadeAberta] = useState(false);
@@ -39,17 +48,22 @@ const Formulario: React.FC = () => {
     if (tipo === 'propriedade') {
       setPropriedadeSelecionada(nome);
       setPropriedadeAberta(false);
+      clearErrors('propriedade');
     } else if (tipo === 'laboratorio') {
       setLaboratorioSelecionado(nome);
       setLaboratorioAberta(false);
+      clearErrors('laboratorio');
     }
   };
+  
 
   const handleClearSelection = (tipo: string) => {
     if (tipo === 'propriedade') {
       setPropriedadeSelecionada(null);
+      setError('propriedade', { type: 'manual' });
     } else if (tipo === 'laboratorio') {
       setLaboratorioSelecionado(null);
+      setError('laboratorio', { type: 'manual' });
     }
   };
 
@@ -64,6 +78,15 @@ const Formulario: React.FC = () => {
   }, [errorLaboratorios, errorPropriedades]);
 
   const onSubmit = (data: FormData) => {
+    if (!propriedadeSelecionada) {
+      setError('propriedade', { type: 'manual' });
+      return;
+    }
+    if (!laboratorioSelecionado) {
+      setError('laboratorio', { type: 'manual'});
+      return;
+    }
+
     const payload = {
       nome: data.nome,
       dataInicial: data.dataInicial,
@@ -102,11 +125,24 @@ const Formulario: React.FC = () => {
               register={register}
               required={true}
               info="nome"
+              errorMessage={errors.nome?.message}
             />
             <DateContainer>
-              <DateInput label="Data Inicial" info="dataInicial" register={register} required />
+              <DateInput
+                label="Data Inicial"
+                info="dataInicial"
+                register={register}
+                required
+                errorMessage={errors.dataInicial?.message}
+              />
               <Separator />
-              <DateInput label="Data Final" info="dataFinal" register={register} required />
+              <DateInput
+                label="Data Final"
+                info="dataFinal"
+                register={register}
+                required
+                errorMessage={errors.dataFinal?.message}
+              />
             </DateContainer>
           </FieldsWrapper>
           <SelectContainer>
@@ -116,6 +152,7 @@ const Formulario: React.FC = () => {
               onSelectClick={() => setPropriedadeAberta(!propriedadeAberta)}
               cnpj={propriedadeSelecionada ? propriedades?.find(prop => prop.nome === propriedadeSelecionada)?.cnpj : null}
               onClearSelection={() => handleClearSelection('propriedade')}
+              error={!!errors.propriedade}
             />
             <SelectButton
               label="Laboratórios *"
@@ -123,6 +160,7 @@ const Formulario: React.FC = () => {
               onSelectClick={() => setLaboratorioAberta(!laboratorioAberto)}
               cnpj={null}
               onClearSelection={() => handleClearSelection('laboratorio')}
+              error={!!errors.laboratorio}
             />
           </SelectContainer>
           <FieldsWrapper>

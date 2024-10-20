@@ -27,6 +27,11 @@ export const ButtonStyle = styled.button`
     outline: none;
     border-bottom: 2px solid #006F59;
   }
+
+  &.error {
+    border-bottom: 2px solid red;
+    color: red;
+  }
 `;
 
 export const IconContainer = styled.div`
@@ -35,7 +40,7 @@ export const IconContainer = styled.div`
   margin-left: 8px;
 `;
 
-export const ClearIcon = styled.img`
+export const Icon = styled.img`
   width: 12px;
   cursor: pointer;
   margin-right: 12px;
@@ -45,4 +50,10 @@ export const CnpjText = styled.div`
   font-size: 12px;
   margin: 0;
   color: #666666;
+`;
+
+export const ErrorMessage = styled.div`
+  font-size: 12px;
+  color: #FF0000;
+  margin-left: 4px;
 `;

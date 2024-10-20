@@ -1,42 +1,50 @@
 import React from 'react';
-import { TextField } from '@mui/material';
-import { FetchProps } from '../types'
+import { TextField, Typography } from '@mui/material';
+import { FetchProps } from '../types';
 
-const DateInput: React.FC<FetchProps> = ({ label, info, register, required = false }) => {
+const DateInput: React.FC<FetchProps> = ({ label, info, register, required = false, errorMessage }) => {
   return (
-    <TextField
-      label={label}
-      type="date"
-      fullWidth
-      variant="standard"
-      margin="normal"
-      required={required}
-      {...register(info)}
-      slotProps={{
-        input: {
-          sx: {
-            color: '#000000',
-            '&:before': {
-              borderBottomColor: '#006F59',
-            },
-            '&:after': {
-              borderBottomColor: '#006F59',
-            },
-            '&:hover:not(.Mui-disabled):before': {
-              borderBottomColor: '#006F59',
-            },
-          },
-        },
-        inputLabel: {
-          sx: {
-            '&.Mui-focused': {
-              color: '#006F59',
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <TextField
+        label={label}
+        type="date"
+        fullWidth
+        variant="standard"
+        margin="normal"
+        required={required}
+        {...register(info, { required: 'Data é obrigatória' })}
+        slotProps={{
+          input: {
+            sx: {
+              color: '#000000',
+              '&:before': {
+                borderBottomColor: errorMessage ? 'red' : '#006F59',
+              },
+              '&:after': {
+                borderBottomColor: errorMessage ? 'red' : '#006F59',
+              },
+              '&:hover:not(.Mui-disabled):before': {
+                borderBottomColor: errorMessage ? 'red' : '#006F59',
+              },
             },
           },
-          shrink: true,
-        },
-      }}
-    />
+          inputLabel: {
+            sx: {
+              color: errorMessage ? 'red' : '#000000',
+              '&.Mui-focused': {
+                color: errorMessage ? 'red' : '#006F59',
+              },
+            },
+            shrink: true,
+          },
+        }}
+      />
+      {errorMessage && (
+        <Typography variant="body2" color="error">
+          {errorMessage}
+        </Typography>
+      )}
+    </div>
   );
 };
 

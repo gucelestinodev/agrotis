@@ -1,7 +1,8 @@
 import React from 'react';
-import { ButtonStyle, IconContainer, ClearIcon, CnpjText } from './SelectButtonStyles';
+import { ButtonStyle, IconContainer, Icon, CnpjText, ErrorMessage } from './SelectButtonStyles';
 import arrowDown from '../../assets/arrow-down.png';
 import closeIcon from '../../assets/close.png';
+import warningIcon from '../../assets/warning.png';
 
 interface SelectButtonProps {
   label: string;
@@ -9,17 +10,29 @@ interface SelectButtonProps {
   cnpj?: string | null;
   onSelectClick: () => void;
   onClearSelection: () => void;
+  error?: boolean;
 }
 
-const SelectButton: React.FC<SelectButtonProps> = ({ label, value, cnpj, onSelectClick, onClearSelection }) => {
+const SelectButton: React.FC<SelectButtonProps> = ({
+  label,
+  value,
+  cnpj,
+  onSelectClick,
+  onClearSelection,
+  error,
+}) => {
   return (
     <div>
-      <ButtonStyle onClick={onSelectClick} className={value ? 'selected' : ''}> {/* Adicionando a classe 'selected' */}
+      <ButtonStyle
+        onClick={onSelectClick}
+        className={`${value ? 'selected' : ''} 
+        ${error ? 'error' : ''}`}
+      >
         {value ? (
           <>
             {value}
             <IconContainer>
-              <ClearIcon
+              <Icon
                 src={closeIcon}
                 alt="Fechar"
                 onClick={(e) => {
@@ -27,17 +40,23 @@ const SelectButton: React.FC<SelectButtonProps> = ({ label, value, cnpj, onSelec
                   onClearSelection();
                 }}
               />
-              <img src={arrowDown} alt="Seta para baixo" style={{ width: '12px' }} />
+              <Icon src={arrowDown} alt="Seta para baixo" />
             </IconContainer>
           </>
         ) : (
           <>
             {label}
-            <img src={arrowDown} alt="Seta para baixo" style={{ width: '12px' }} />
+            <Icon src={arrowDown} alt="Seta para baixo" />
           </>
         )}
       </ButtonStyle>
       {cnpj && <CnpjText>CNPJ: {cnpj}</CnpjText>}
+      {error &&
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <img src={warningIcon} alt="Warning" />
+          <ErrorMessage>Error</ErrorMessage>
+        </div>
+      }
     </div>
   );
 };
