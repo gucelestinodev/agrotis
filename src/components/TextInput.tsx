@@ -1,10 +1,21 @@
-import React from 'react';
-import { TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Typography, Box } from '@mui/material';
 import { FetchProps } from '../types';
 
+const MAX_LENGTH = 40;
+
 const TextInput: React.FC<FetchProps> = ({ label, register, required = false, info, errorMessage }) => {
+  const [charCount, setCharCount] = useState(0);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    if (inputValue.length <= MAX_LENGTH) {
+      setCharCount(inputValue.length);
+    }
+  };
+
   return (
-    <div>
+    <Box>
       <TextField
         fullWidth
         label={label}
@@ -12,6 +23,7 @@ const TextInput: React.FC<FetchProps> = ({ label, register, required = false, in
         variant="standard"
         margin="normal"
         {...register(info, { required: 'Nome é obrigatório' })}
+        onChange={handleInputChange}
         slotProps={{
           input: {
             sx: {
@@ -35,6 +47,9 @@ const TextInput: React.FC<FetchProps> = ({ label, register, required = false, in
               },
             },
           },
+          htmlInput: {
+            maxLength: MAX_LENGTH,
+          },
         }}
       />
       {errorMessage && (
@@ -42,7 +57,10 @@ const TextInput: React.FC<FetchProps> = ({ label, register, required = false, in
           {errorMessage}
         </Typography>
       )}
-    </div>
+      <Typography variant="caption" display="block" align="right" color="textSecondary">
+        {`${charCount}/${MAX_LENGTH}`}
+      </Typography>
+    </Box>
   );
 };
 
