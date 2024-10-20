@@ -28,12 +28,11 @@ export const ButtonSave = styled.button`
   background-color: #006F59;
   border: none;
   color: #ffffff;
-  padding: 4px 16px;
+  padding: 0px 16px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
   cursor: pointer;
 
   &:hover {
@@ -49,9 +48,9 @@ export const ButtonSave = styled.button`
 export const FormTitle = styled.h1`
   color: #ffffff;
   font-size: 22px;
-  margin-bottom: 20px;
   text-align: center;
   font-weight: 400;
+  margin: 12px 0px;
 `;
 
 export const FieldsWrapper = styled.div`
@@ -141,4 +140,32 @@ export const CnpjText = styled.span`
   display: block;
   font-size: 12px;
   opacity: 0.5;
+`;
+
+export const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  
+  &::after {
+    content: '';
+    border: 8px solid #f3f3f3; 
+    border-top: 8px solid #006F59;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;

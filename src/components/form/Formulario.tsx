@@ -1,29 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import TextInput from '../TextInput';
 import DateInput from '../DateInput';
 import SelectButton from '../SelectButton/SelectButton';
 import ObservacoesInput from '../ObservacoesInput';
-import axios from 'axios';
-import { Laboratorio, Propriedade } from '../../types';
-import { Container, DateContainer, FormCard, FormTitle, SelectContainer, FieldsWrapper, InfoTitle, ButtonSave, Button, Separator, OptionsWrapper, DualSelectContainer, CnpjText } from './FormularioStyles';
+import { Laboratorio, Propriedade, FormData } from '../../types';
+import { useFetch } from '../../hooks/useFetch';
+import {
+  Container,
+  DateContainer,
+  FormCard,
+  FormTitle,
+  SelectContainer,
+  FieldsWrapper,
+  InfoTitle,
+  ButtonSave,
+  Separator,
+  DualSelectContainer,
+  OptionsWrapper,
+  Button,
+  CnpjText,
+  LoadingOverlay,
+} from './FormularioStyles';
+import ErrorModal from '../Modal/ModalError';
 
 const Formulario: React.FC = () => {
-  const [nome, setNome] = useState('');
-  const [observacoes, setObservacoes] = useState('');
-  const [laboratorios, setLaboratorios] = useState<Laboratorio[]>([]);
-  const [propriedades, setPropriedades] = useState<Propriedade[]>([]);
+  const { register, handleSubmit } = useForm<FormData>();
   const [laboratorioSelecionado, setLaboratorioSelecionado] = useState<string | null>(null);
   const [propriedadeSelecionada, setPropriedadeSelecionada] = useState<string | null>(null);
   const [propriedadeAberta, setPropriedadeAberta] = useState(false);
-  const [laboratorioAberto, setLaboratorioAberto] = useState(false);
+  const [laboratorioAberto, setLaboratorioAberta] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
-  useEffect(() => {
-    axios.get('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/laboratorios.json')
-      .then(response => setLaboratorios(response.data));
-
-    axios.get('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/propriedades.json')
-      .then(response => setPropriedades(response.data));
-  }, []);
+  const { data: laboratorios, error: errorLaboratorios, isLoading: isLoadingLaboratorios } = useFetch<Laboratorio[]>('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/laboratorios.json');
+  const { data: propriedades, error: errorPropriedades, isLoading: isLoadingPropriedades } = useFetch<Propriedade[]>('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/propriedades.json');
 
   const handleOptionSelect = (tipo: string, nome: string) => {
     if (tipo === 'propriedade') {
@@ -31,7 +41,7 @@ const Formulario: React.FC = () => {
       setPropriedadeAberta(false);
     } else if (tipo === 'laboratorio') {
       setLaboratorioSelecionado(nome);
-      setLaboratorioAberto(false);
+      setLaboratorioAberta(false);
     }
   };
 
@@ -43,46 +53,91 @@ const Formulario: React.FC = () => {
     }
   };
 
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  useEffect(() => {
+    if (errorLaboratorios || errorPropriedades) {
+      setShowErrorModal(true);
+    }
+  }, [errorLaboratorios, errorPropriedades]);
+
+  const onSubmit = (data: FormData) => {
+    const payload = {
+      nome: data.nome,
+      dataInicial: data.dataInicial,
+      dataFinal: data.dataFinal,
+      infosPropriedade: {
+        id: propriedades?.find(prop => prop.nome === propriedadeSelecionada)?.id,
+        nome: propriedadeSelecionada,
+      },
+      cnpj: propriedades?.find(prop => prop.nome === propriedadeSelecionada)?.cnpj,
+      laboratorio: {
+        id: laboratorios?.find(lab => lab.nome === laboratorioSelecionado)?.id,
+        nome: laboratorioSelecionado,
+      },
+      observacoes: data.observacoes,
+    };
+
+    console.log(payload);
+  };
+
   return (
     <Container>
-      <FormCard>
-        <InfoTitle>
-          <FormTitle>Teste front-end</FormTitle>
-          <ButtonSave>Salvar</ButtonSave>
-        </InfoTitle>
-        <FieldsWrapper>
-          <TextInput label="Nome *" value={nome} onChange={(e) => setNome(e.target.value)} />
-          <DateContainer>
-            <DateInput label="Data Inicial *" />
-            <Separator />
-            <DateInput label="Data Final *" />
-          </DateContainer>
-        </FieldsWrapper>
-        <SelectContainer>
-          <SelectButton
-            label="Propriedades *"
-            value={propriedadeSelecionada}
-            onSelectClick={() => setPropriedadeAberta(!propriedadeAberta)}
-            cnpj={propriedadeSelecionada ? propriedades.find(prop => prop.nome === propriedadeSelecionada)?.cnpj : null}
-            onClearSelection={() => handleClearSelection('propriedade')}
-          />
-          <SelectButton
-            label="Laboratórios *"
-            value={laboratorioSelecionado}
-            onSelectClick={() => setLaboratorioAberto(!laboratorioAberto)}
-            cnpj={laboratorioSelecionado ? propriedades.find(prop => prop.nome === laboratorioSelecionado)?.cnpj : null}
-            onClearSelection={() => handleClearSelection('laboratorio')}
-          />
-        </SelectContainer>
-
-        <FieldsWrapper>
-          <ObservacoesInput value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
-        </FieldsWrapper>
-      </FormCard>
+      {showErrorModal && (
+        <ErrorModal onRetry={handleRetry} onClose={() => setShowErrorModal(false)} />
+      )}
+      {isLoadingLaboratorios || isLoadingPropriedades ? (
+        <LoadingOverlay color="#006F59" />
+      ) : (
+        <FormCard>
+          <InfoTitle>
+            <FormTitle>Teste front-end</FormTitle>
+            <ButtonSave onClick={handleSubmit(onSubmit)}>Salvar</ButtonSave>
+          </InfoTitle>
+          <FieldsWrapper>
+            <TextInput
+              label="Nome"
+              register={register}
+              required={true}
+              info="nome"
+            />
+            <DateContainer>
+              <DateInput label="Data Inicial" info="dataInicial" register={register} required />
+              <Separator />
+              <DateInput label="Data Final" info="dataFinal" register={register} required />
+            </DateContainer>
+          </FieldsWrapper>
+          <SelectContainer>
+            <SelectButton
+              label="Propriedades *"
+              value={propriedadeSelecionada}
+              onSelectClick={() => setPropriedadeAberta(!propriedadeAberta)}
+              cnpj={propriedadeSelecionada ? propriedades?.find(prop => prop.nome === propriedadeSelecionada)?.cnpj : null}
+              onClearSelection={() => handleClearSelection('propriedade')}
+            />
+            <SelectButton
+              label="Laboratórios *"
+              value={laboratorioSelecionado}
+              onSelectClick={() => setLaboratorioAberta(!laboratorioAberto)}
+              cnpj={null}
+              onClearSelection={() => handleClearSelection('laboratorio')}
+            />
+          </SelectContainer>
+          <FieldsWrapper>
+            <ObservacoesInput
+              label="Observações"
+              info="observacoes"
+              register={register}
+            />
+          </FieldsWrapper>
+        </FormCard>
+      )}
       <DualSelectContainer>
         {propriedadeAberta && (
           <OptionsWrapper>
-            {propriedades.map((prop) => (
+            {propriedades?.map((prop) => (
               <Button key={prop.id} onClick={() => handleOptionSelect('propriedade', prop.nome)} size="small">
                 <div>
                   {prop.nome}
@@ -94,7 +149,7 @@ const Formulario: React.FC = () => {
         )}
         {laboratorioAberto && (
           <OptionsWrapper>
-            {laboratorios.map((lab) => (
+            {laboratorios?.map((lab) => (
               <Button key={lab.id} onClick={() => handleOptionSelect('laboratorio', lab.nome)} size="large">
                 {lab.nome}
               </Button>

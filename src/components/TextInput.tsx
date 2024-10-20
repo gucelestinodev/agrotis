@@ -1,27 +1,20 @@
 import React from 'react';
 import { TextField } from '@mui/material';
+import { FetchProps } from '../types'
 
-interface TextInputProps {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-}
-
-const TextInput: React.FC<TextInputProps> = ({ label, value, onChange, required = false }) => {
+const TextInput: React.FC<FetchProps> = ({ label, register, required = false, info }) => {
   return (
     <TextField
       fullWidth
       label={label}
-      value={value}
-      onChange={onChange}
       required={required}
       variant="standard"
       margin="normal"
+      {...register(info)}
       slotProps={{
         input: {
           sx: {
-            color: '#000000', 
+            color: '#000000',
             '&:before': {
               borderBottomColor: '#006F59',
             },

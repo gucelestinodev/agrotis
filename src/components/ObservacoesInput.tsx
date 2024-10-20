@@ -1,22 +1,18 @@
 import React from 'react';
 import { TextField } from '@mui/material';
+import { FetchProps } from '../types'
 
-interface ObservacoesInputProps {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-const ObservacoesInput: React.FC<ObservacoesInputProps> = ({ value, onChange }) => {
+const ObservacoesInput: React.FC<FetchProps> = ({ label = "Observações", register, info, required = false }) => {
   return (
     <TextField
-      label="Observações"
-      value={value}
-      onChange={onChange}
+      label={label}
       fullWidth
       multiline
       rows={4}
       margin="normal"
       variant="standard"
+      required={required}
+      {...register(info)}
       slotProps={{
         input: {
           sx: {

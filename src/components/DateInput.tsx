@@ -1,7 +1,8 @@
 import React from 'react';
 import { TextField } from '@mui/material';
+import { FetchProps } from '../types'
 
-const DateInput: React.FC<{ label: string }> = ({ label }) => {
+const DateInput: React.FC<FetchProps> = ({ label, info, register, required = false }) => {
   return (
     <TextField
       label={label}
@@ -9,6 +10,8 @@ const DateInput: React.FC<{ label: string }> = ({ label }) => {
       fullWidth
       variant="standard"
       margin="normal"
+      required={required}
+      {...register(info)}
       slotProps={{
         input: {
           sx: {
@@ -23,11 +26,6 @@ const DateInput: React.FC<{ label: string }> = ({ label }) => {
               borderBottomColor: '#006F59',
             },
           },
-        },
-        htmlInput: {
-          sx: {
-            label,
-          }
         },
         inputLabel: {
           sx: {
