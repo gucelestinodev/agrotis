@@ -7,7 +7,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 32px 40px;
   background-color: #f1f1f1;
   min-height: 100vh;
 `;
@@ -15,6 +15,7 @@ export const Container = styled.div`
 export const FormCard = styled.div`
   background-color: #ffffff;
   width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
 export const InfoTitle = styled.div`
@@ -22,21 +23,25 @@ export const InfoTitle = styled.div`
   justify-content: space-between;
   background-color: #006F59;
   padding: 0px 16px;
+  align-items: center;
 `;
 
 export const ButtonSave = styled.button`
   background-color: #006F59;
   border: none;
   color: #ffffff;
-  padding: 0px 16px;
+  padding: 0px 18px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
   cursor: pointer;
+  height: 36px;
 
   &:hover {
     background-color: #00947A;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
   }
 
   &:disabled {
@@ -128,11 +133,29 @@ export const OptionsWrapper = styled.div`
   margin: 12px;
   background-color: #ffffff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-height: 280px; 
+  max-height: 260px; 
   overflow-y: auto;
 
   h4 {
     margin-bottom: 8px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888888;
+    border-radius: 6px;
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #666666;
   }
 `;
 

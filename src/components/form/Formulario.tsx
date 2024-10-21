@@ -5,7 +5,9 @@ import DateInput from '../DateInput';
 import SelectButton from '../SelectButton/SelectButton';
 import ObservacoesInput from '../ObservacoesInput';
 import { Laboratorio, Propriedade, FormData } from '../../types';
+import { fetchLaboratorios, fetchPropriedades } from '../../services/api';
 import { useFetch } from '../../hooks/useFetch';
+import ModalSuccess from '../Modal/ModalSuccess/ModalSuccess'
 import {
   Container,
   DateContainer,
@@ -39,10 +41,21 @@ const Formulario: React.FC = () => {
   const [propriedadeSelecionada, setPropriedadeSelecionada] = useState<string | null>(null);
   const [propriedadeAberta, setPropriedadeAberta] = useState(false);
   const [laboratorioAberto, setLaboratorioAberta] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
-  const { data: laboratorios, error: errorLaboratorios, isLoading: isLoadingLaboratorios } = useFetch<Laboratorio[]>('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/laboratorios.json');
-  const { data: propriedades, error: errorPropriedades, isLoading: isLoadingPropriedades } = useFetch<Propriedade[]>('https://bitbucket.org/agrotis/teste-rh/raw/3bc797776e54586552d1c9666fd7c13366fc9548/teste-front-end-1/propriedades.json');
+  const {
+    data: laboratorios,
+    error: errorLaboratorios,
+    isLoading: isLoadingLaboratorios
+  } = useFetch<Laboratorio[]>(fetchLaboratorios);
+
+  const {
+    data: propriedades,
+    error: errorPropriedades,
+    isLoading:
+    isLoadingPropriedades
+  } = useFetch<Propriedade[]>(fetchPropriedades);
 
   const handleOptionSelect = (tipo: string, nome: string) => {
     if (tipo === 'propriedade') {
@@ -55,7 +68,7 @@ const Formulario: React.FC = () => {
       clearErrors('laboratorio');
     }
   };
-  
+
 
   const handleClearSelection = (tipo: string) => {
     if (tipo === 'propriedade') {
@@ -78,19 +91,30 @@ const Formulario: React.FC = () => {
   }, [errorLaboratorios, errorPropriedades]);
 
   const onSubmit = (data: FormData) => {
+
+    if (data.dataInicial && data.dataFinal) {
+      const dataInicial = new Date(data.dataInicial);
+      const dataFinal = new Date(data.dataFinal);
+
+      if (dataInicial > dataFinal) {
+        setError('dataFinal', { type: 'manual', message: 'A data final não pode ser menor à data inicial.' });
+        return;
+      }
+    }
+
     if (!propriedadeSelecionada) {
       setError('propriedade', { type: 'manual' });
       return;
     }
     if (!laboratorioSelecionado) {
-      setError('laboratorio', { type: 'manual'});
+      setError('laboratorio', { type: 'manual' });
       return;
     }
 
     const payload = {
       nome: data.nome,
-      dataInicial: data.dataInicial,
-      dataFinal: data.dataFinal,
+      dataInicial: new Date(data.dataInicial).toISOString(),
+      dataFinal: new Date(data.dataFinal).toISOString(),
       infosPropriedade: {
         id: propriedades?.find(prop => prop.nome === propriedadeSelecionada)?.id,
         nome: propriedadeSelecionada,
@@ -104,10 +128,15 @@ const Formulario: React.FC = () => {
     };
 
     console.log(payload);
+    setShowSuccessModal(true);
+    setTimeout(() => {
+      setShowSuccessModal(false);
+    }, 1000);
   };
 
   return (
     <Container>
+      <ModalSuccess isOpen={showSuccessModal} onClose={() => setShowSuccessModal(false)} />
       {showErrorModal && (
         <ErrorModal onRetry={handleRetry} onClose={() => setShowErrorModal(false)} />
       )}

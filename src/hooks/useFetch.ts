@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { AxiosResponse } from 'axios';
 
 interface UseFetchResult<T> {
   data: T | null;
@@ -7,7 +7,7 @@ interface UseFetchResult<T> {
   isLoading: boolean;
 }
 
-export function useFetch<T>(url: string): UseFetchResult<T> {
+export function useFetch<T>(fetchFunction: () => Promise<AxiosResponse<T>>): UseFetchResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -15,17 +15,18 @@ export function useFetch<T>(url: string): UseFetchResult<T> {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
+        const response = await fetchFunction();
         setData(response.data);
-      } catch (err) {
-        setError('Erro ao carregar os dados.');
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || 'Erro ao carregar os dados.';
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [url]);
+  }, [fetchFunction]);
 
   return { data, error, isLoading };
 }
